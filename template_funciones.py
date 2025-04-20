@@ -1,7 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd # Para leer archivos
+import geopandas as gpd # Para hacer cosas geográficas
+import seaborn as sns # Para hacer plots lindos
+import networkx as nx # Construcción de la red en NetworkX
 import scipy
+
+def matriz_de_distancias(museos):
+    # Tomamos museos, lo convertimos al sistema de coordenadas de interés, extraemos su geometría (los puntos del mapa), 
+    # calculamos sus distancias a los otros puntos de df, redondeamos (obteniendo distancia en metros), y lo convertimos a un array 2D de numpy
+    D = museos.to_crs("EPSG:22184").geometry.apply(lambda g: museos.to_crs("EPSG:22184").distance(g)).round().to_numpy()
+    return D
 
 def construye_adyacencia(D,m): 
     # Función que construye la matriz de adyacencia del grafo de museos
@@ -80,6 +89,44 @@ def calcula_pagerank(A,d):
     Up = scipy.linalg.solve_triangular(L,b,lower=True) # Primera inversión usando L
     p = scipy.linalg.solve_triangular(U,Up) # Segunda inversión usando U
     return p
+
+def calcular_p(D, m, d):
+    # D matriz de distancias, 
+    # m: Cantidad de links por nodo
+    # d: Factor de dumping
+    # Retorna: vector p con scores de page rank normalizados
+    A = construye_adyacencia(D,m)
+    pr = calcula_pagerank(A, d)# Este va a ser su score Page Rank
+    pr = pr/pr.sum() # Normalizamos para que sume 1
+    return pr 
+
+def construir_red_para_visualizar(A, museos):
+    G = nx.from_numpy_array(A) # Construimos la red a partir de la matriz de adyacencia
+    # Construimos un layout a partir de las coordenadas geográficas
+    G_layout = {i:v for i,v in enumerate(zip(museos.to_crs("EPSG:22184").get_coordinates()['x'],museos.to_crs("EPSG:22184").get_coordinates()['y']))}
+    return G, G_layout
+
+def graficar_red_p(pr, A, museos, barrios, Nprincipales = 0, factor_escala = 1e4):
+    # pr: Vector de scores de page rank normalizados
+    # A: matriz de adyacencia
+    # museos y barrios: datos
+    # Nprincipales: Cantidad de principales
+    # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
+    
+    G, G_layout = construir_red_para_visualizar(A, museos)
+
+    fig, ax = plt.subplots(figsize=(15, 15)) # Visualización de la red en el mapa
+    principales = np.argsort(pr)[-Nprincipales:] # Identificamos a los N principales
+    labels = {n: str(n) if i in principales else "" for i, n in enumerate(G.nodes)} # Nombres para esos nodos
+    barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax) # Graficamos Los barrios
+
+    nx.draw_networkx(G,G_layout,node_size = pr*factor_escala, ax=ax,with_labels=False) # Graficamos red
+    nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, font_color="k") # Agregamos los nombres
+
+    #titulo
+    plt.title('Museos de Buenos Aires', fontsize=20)
+
+    plt.show()
 
 def calcula_matriz_C_continua(D): 
     # Función para calcular la matriz de trancisiones C
