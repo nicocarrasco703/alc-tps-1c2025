@@ -37,25 +37,46 @@ def calculaLU(matriz):
     
     return L, U
 
+def construir_matriz_grado(M):
+    # para cada fila sumo todas sus columnas y lo guardo en la matriz de grado
+    K = np.zeros(M.shape) # Inicializo la matriz de grado
+    for i in range(M.shape[0]):
+        K[i,i] = np.sum(M[i,:])
+    return K
+
+def inversa_de_triangular(M):
+    # inicialzo matriz identidad
+    I = np.eye(M.shape[0])
+    return scipy.linalg.solve_triangular(M,I)
+
+def crear_matriz_transiciones(M, Kinv):
+    C = np.transpose(M) @ Kinv
+    return C
+
 def calcula_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
     # Retorna la matriz C
-    Kinv = ... # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    C = ... # Calcula C multiplicando Kinv y A
+    K = construir_matriz_grado(A)
+    K_inv = inversa_de_triangular(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
+    C = crear_matriz_transiciones(A, K_inv) # Calcula C multiplicando Kinv y A
     return C
 
-    
-def calcula_pagerank(A,alfa):
+def calcula_pagerank(A,d):
     # Función para calcular PageRank usando LU
     # A: Matriz de adyacencia
     # d: coeficientes de damping
     # Retorna: Un vector p con los coeficientes de page rank de cada museo
     C = calcula_matriz_C(A)
-    N = ... # Obtenemos el número de museos N a partir de la estructura de la matriz A
-    M = ...
+    N = C.shape[0] # Obtenemos el número de museos N a partir de la estructura de la matriz A
+     # vector de unos
+    
+    M = (1-d) * C
+    M = np.eye(N) - M
+    M = (N/d) * M
     L, U = calculaLU(M) # Calculamos descomposición LU a partir de C y d
-    b = ... # Vector de 1s, multiplicado por el coeficiente correspondiente usando d y N.
+    
+    b = np.ones(N) * d # Vector de 1s, multiplicado por el coeficiente correspondiente usando d y N.
     Up = scipy.linalg.solve_triangular(L,b,lower=True) # Primera inversión usando L
     p = scipy.linalg.solve_triangular(U,Up) # Segunda inversión usando U
     return p
@@ -79,5 +100,6 @@ def calcula_B(C,cantidad_de_visitas):
     # Retorna:Una matriz B que vincula la cantidad de visitas w con la cantidad de primeras visitas v
     B = np.eye(C.shape[0])
     for i in range(cantidad_de_visitas-1):
+        print(i)
         # Sumamos las matrices de transición para cada cantidad de pasos
     return B
