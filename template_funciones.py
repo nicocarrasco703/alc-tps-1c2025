@@ -1,3 +1,8 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd # Para leer archivos
+import scipy
+
 def construye_adyacencia(D,m): 
     # Función que construye la matriz de adyacencia del grafo de museos
     # D matriz de distancias, m cantidad de links por nodo
@@ -13,7 +18,24 @@ def construye_adyacencia(D,m):
 def calculaLU(matriz):
     # matriz es una matriz de NxN
     # Retorna la factorización LU a través de una lista con dos matrices L y U de NxN.
-    # Completar! Have fun
+    m=matriz.shape[0]
+    n=matriz.shape[1]
+    Ac = matriz.copy()
+    
+    if m!=n:
+        print('Matriz no cuadrada')
+        return
+
+    for j in range(m-1):
+        for i in range(j+1, n):
+            Ac[i, j] = Ac[i, j] / Ac[j, j]
+            for k in range(j+1, m):
+                    Ac[i, k] = Ac[i, k] - Ac[j, k] * Ac[i, j]
+            
+    L = np.tril(Ac,-1) + np.eye(matriz.shape[0]) 
+    U = np.triu(Ac)
+    
+    return L, U
 
 def calcula_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
