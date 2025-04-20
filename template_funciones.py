@@ -106,9 +106,11 @@ def construir_red_para_visualizar(A, museos):
     G_layout = {i:v for i,v in enumerate(zip(museos.to_crs("EPSG:22184").get_coordinates()['x'],museos.to_crs("EPSG:22184").get_coordinates()['y']))}
     return G, G_layout
 
-def graficar_red_p(pr, A, museos, barrios, Nprincipales = 0, factor_escala = 1e4):
+def graficar_red_p(pr, A, m, d, museos, barrios, Nprincipales = 0, factor_escala = 1e4):
     # pr: Vector de scores de page rank normalizados
     # A: matriz de adyacencia
+    # m: 
+    # d: TODO
     # museos y barrios: datos
     # Nprincipales: Cantidad de principales
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
@@ -122,6 +124,12 @@ def graficar_red_p(pr, A, museos, barrios, Nprincipales = 0, factor_escala = 1e4
 
     nx.draw_networkx(G,G_layout,node_size = pr*factor_escala, ax=ax,with_labels=False) # Graficamos red
     nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, font_color="k") # Agregamos los nombres
+
+    ax.text(0.05, 0.95, f'm = {m}', transform=ax.transAxes, fontsize=15,
+            verticalalignment='top')
+    
+    ax.text(0.05, 0.90, f'd = {d:{3}.{2}}', transform=ax.transAxes, fontsize=15,
+            verticalalignment='top')
 
     #titulo
     plt.title('Museos de Buenos Aires', fontsize=20)
