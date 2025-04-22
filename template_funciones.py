@@ -25,6 +25,7 @@ def construye_adyacencia(D,m):
     return(A)
 
 def calculaLU(matriz):
+    # Función para calcular la descomposición LU de una matriz
     # matriz es una matriz de NxN
     # Retorna la factorización LU a través de una lista con dos matrices L y U de NxN.
     m=matriz.shape[0]
@@ -47,20 +48,27 @@ def calculaLU(matriz):
     return L, U
 
 def construir_matriz_grado(M):
-    # para cada fila sumo todas sus columnas y lo guardo en la matriz de grado
+    # Función para construir la matriz de grado a partir de la matriz de adyacencia
+    # M: Matriz de adyacencia
+    # Retorna la matriz de grado K
+
     K = np.zeros(M.shape) # Inicializo la matriz de grado
+
+    # Para cada fila sumo todas sus columnas y lo guardo en la matriz de grado
     for i in range(M.shape[0]):
         K[i,i] = np.sum(M[i,:])
     return K
 
 def inversa_de_triangular(M):
-    # inicialzo matriz identidad
-    I = np.eye(M.shape[0])
-    return scipy.linalg.solve_triangular(M,I)
+    # Función para calcular la inversa de una matriz triangular inferior
+    # M: Matriz triangular inferior
+    # Retorna la inversa de M
 
-def crear_matriz_transiciones(M, Kinv):
-    C = np.transpose(M) @ Kinv
-    return C
+    # Inicializo la matriz identidad
+    I = np.eye(M.shape[0])
+
+    # Usamos scipy para resolver el sistema triangular (Mx = I)
+    return scipy.linalg.solve_triangular(M,I)
 
 def calcula_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
@@ -68,7 +76,7 @@ def calcula_matriz_C(A):
     # Retorna la matriz C
     K = construir_matriz_grado(A)
     K_inv = inversa_de_triangular(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    C = crear_matriz_transiciones(A, K_inv) # Calcula C multiplicando Kinv y A
+    C = np.transpose(A) @ K_inv # Calcula C multiplicando Kinv y A
     return C
 
 def calcula_pagerank(A,d):
