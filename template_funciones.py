@@ -170,3 +170,31 @@ def calcula_B(C,cantidad_de_visitas):
         Cpow = np.linalg.matrix_power(C,i+1)
         B += Cpow
     return B
+
+def calcular_norma_v(A, w, r):
+    # Función para calcular la norma del vector v, es decir la cantidad total de visitantes que ingresaron a la red
+    # A: Matriz de adyacencia
+    # w: vector con el número total de visitantes por museo
+    # Retorna: la norma del vector v
+
+    C = calcula_matriz_C_continua(A)
+    B = calcula_B(C, r)
+    L, U = calculaLU(B) # Calculamos descomposición LU a partir de B
+
+    Uv = scipy.linalg.solve_triangular(L,w,lower=True) # Primera inversión usando L
+    v = scipy.linalg.solve_triangular(U,Uv) # Segunda inversión usando U
+
+    return np.linalg.norm(v, ord=1), v
+
+def graficar_histograma_v(v):
+    # Función que grafica un histograma de los elementos del vector v.
+    # v: vector donde v[i] es la cantidad de visitantes iniciales en el i-esimo museo
+    # Retorna: un histograma de los elementos de v
+
+    plt.figure(figsize=(15, 6))
+    plt.bar(range(len(v)), v, color='skyblue', edgecolor='black')
+    plt.xlabel('Índice del museo', fontsize=14)
+    plt.ylabel('Cantidad de visitantes iniciales', fontsize=14)
+    plt.title('Distribución de visitantes iniciales por museo', fontsize=16)
+    plt.xticks(range(len(v)), range(len(v)), rotation=90, fontsize=6)
+    plt.show()
