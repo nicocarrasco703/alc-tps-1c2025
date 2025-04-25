@@ -70,7 +70,7 @@ def inversa_de_triangular(M):
     # Usamos scipy para resolver el sistema triangular (Mx = I)
     return scipy.linalg.solve_triangular(M,I)
 
-def calcula_matriz_C(A): 
+def calcular_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
     # Retorna la matriz C
@@ -79,12 +79,12 @@ def calcula_matriz_C(A):
     C = np.transpose(A) @ K_inv # Calcula C multiplicando Kinv y A
     return C
 
-def calcula_pagerank(A,d):
+def calcular_page_ranks(A,d):
     # Función para calcular PageRank usando LU
     # A: Matriz de adyacencia
     # d: coeficientes de damping
     # Retorna: Un vector p con los coeficientes de page rank de cada museo
-    C = calcula_matriz_C(A)
+    C = calcular_matriz_C(A)
     N = C.shape[0] # Obtenemos el número de museos N a partir de la estructura de la matriz A
      # vector de unos
     
@@ -104,7 +104,7 @@ def calcular_p(D, m, d):
     # d: Factor de dumping
     # Retorna: vector p con scores de page rank normalizados
     A = construye_adyacencia(D,m)
-    pr = calcula_pagerank(A, d)# Este va a ser su score Page Rank
+    pr = calcular_page_ranks(A, d)# Este va a ser su score Page Rank
     pr = pr/pr.sum() # Normalizamos para que sume 1
     return pr 
 
@@ -114,14 +114,15 @@ def construir_red_para_visualizar(A, museos):
     G_layout = {i:v for i,v in enumerate(zip(museos.to_crs("EPSG:22184").get_coordinates()['x'],museos.to_crs("EPSG:22184").get_coordinates()['y']))}
     return G, G_layout
 
-def graficar_red_p(pr, A, m, d, museos, barrios, Nprincipales = 0, factor_escala = 1e4):
+def graficar_red_p(pr, A, m, alpha, museos, barrios, Nprincipales = 0, factor_escala = 1e4):
     # pr: Vector de scores de page rank normalizados
     # A: matriz de adyacencia
-    # m: 
-    # d: TODO
+    # m: cantidad de links por nodo
+    # alpha: coeficiente de damping
     # museos y barrios: datos
     # Nprincipales: Cantidad de principales
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
+    # Retorna: Un gráfico de la red de museos
     
     G, G_layout = construir_red_para_visualizar(A, museos)
 
@@ -136,7 +137,7 @@ def graficar_red_p(pr, A, m, d, museos, barrios, Nprincipales = 0, factor_escala
     ax.text(0.05, 0.95, f'm = {m}', transform=ax.transAxes, fontsize=15,
             verticalalignment='top')
     
-    ax.text(0.05, 0.90, f'd = {d:{3}.{2}}', transform=ax.transAxes, fontsize=15,
+    ax.text(0.05, 0.90, f'α = {alpha:{3}.{2}}', transform=ax.transAxes, fontsize=15,
             verticalalignment='top')
 
     #titulo
@@ -159,7 +160,7 @@ def calcula_matriz_C_continua(D):
 def calcula_B(C,cantidad_de_visitas):
     # Recibe la matriz T de transiciones, y calcula la matriz B que representa la relación entre el total de visitas y el número inicial de visitantes
     # suponiendo que cada visitante realizó cantidad_de_visitas pasos
-    # C: Matirz de transiciones
+    # C: Matriz de transiciones
     # cantidad_de_visitas: Cantidad de pasos en la red dado por los visitantes. Indicado como r en el enunciado
     # Retorna:Una matriz B que vincula la cantidad de visitas w con la cantidad de primeras visitas v
     B = np.eye(C.shape[0])
@@ -173,13 +174,17 @@ def calcula_B(C,cantidad_de_visitas):
 
 def norma_1_vector(v):
     # Calcula norma 1 del vector v perteneciente a Rn
-    # v: array de numpy
+    # v: vector
+    # Retorna la norma 1 del vector v
     resultado = 0
     for x in v:
         resultado += abs(x)
     return resultado
 
 def norma_1_matriz(M):
+    # Calcula norma 1 de la matriz M
+    # M: matriz
+    # Retorna la norma 1 de la matriz M
     n = M.shape[0]
     m = M.shape[1]
     suma_abs_columnas = np.zeros(m)
@@ -194,11 +199,11 @@ def norma_1_matriz(M):
     
     return max
 
-def calcular_norma_v(A, w, r):
-    # Función para calcular la norma del vector v, es decir la cantidad total de visitantes que ingresaron a la red
+def calcular_v(A, w, r):
+    # Función para calcular el vector v y su norma 1, es decir la cantidad total de visitantes que ingresaron a la red
     # A: Matriz de adyacencia
     # w: vector con el número total de visitantes por museo
-    # Retorna: la norma del vector v
+    # Retorna: la norma del vector v y el vector v
 
     C = calcula_matriz_C_continua(A)
     B = calcula_B(C, r)
@@ -208,6 +213,28 @@ def calcular_norma_v(A, w, r):
     v = scipy.linalg.solve_triangular(U,Uv) # Segunda inversión usando U
 
     return norma_1_vector(v), v
+
+def calcular_cond1_de_B(D):
+    # Calculamos la matriz B
+    C = calcula_matriz_C_continua(D)
+    B = calcula_B(C, 3)
+
+    # Calculamos la inversa de la matriz B
+
+    L, U = calculaLU(B) # Calculamos descomposición LU a partir de B
+    n = B.shape[0] # Cantidad de filas de B
+    I = np.eye(n) # Matriz identidad de tamaño n
+
+    Binv = np.zeros((n,n)) # Inicializamos la matriz inversa de B
+
+    for i in range(n):
+        y = scipy.linalg.solve_triangular(L, I[:, i], lower=True) # Resolvemos Ly = I para la columna i
+        Binv [:, i] = scipy.linalg.solve_triangular(U, y, lower=False) # Resolvemos Ux = y para la columna i
+
+    B_norm = norma_1_matriz(B)
+    Binv_norm = norma_1_matriz(Binv)
+
+    return B_norm * Binv_norm
 
 def graficar_histograma_v(v):
     # Función que grafica un histograma de los elementos del vector v.
