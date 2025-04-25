@@ -165,7 +165,7 @@ def calcula_B(C,cantidad_de_visitas):
     B = np.eye(C.shape[0])
 
     for i in range(cantidad_de_visitas-1):
-        print(i)
+        #print(i)
         # Sumamos las matrices de transición para cada cantidad de pasos
         Cpow = np.linalg.matrix_power(C,i+1)
         B += Cpow
