@@ -171,6 +171,29 @@ def calcula_B(C,cantidad_de_visitas):
         B += Cpow
     return B
 
+def norma_1_vector(v):
+    # Calcula norma 1 del vector v perteneciente a Rn
+    # v: array de numpy
+    resultado = 0
+    for x in v:
+        resultado += abs(x)
+    return resultado
+
+def norma_1_matriz(M):
+    n = M.shape[0]
+    m = M.shape[1]
+    suma_abs_columnas = np.zeros(m)
+    for i in range(n):
+        for j in range(m):
+            suma_abs_columnas[j] += abs(M[i][j])
+        
+    max = -1
+    for j in range(m):
+        if suma_abs_columnas[j] >= max:
+            max = suma_abs_columnas[j]
+    
+    return max
+
 def calcular_norma_v(A, w, r):
     # Función para calcular la norma del vector v, es decir la cantidad total de visitantes que ingresaron a la red
     # A: Matriz de adyacencia
@@ -184,7 +207,7 @@ def calcular_norma_v(A, w, r):
     Uv = scipy.linalg.solve_triangular(L,w,lower=True) # Primera inversión usando L
     v = scipy.linalg.solve_triangular(U,Uv) # Segunda inversión usando U
 
-    return np.linalg.norm(v, ord=1), v
+    return norma_1_vector(v), v
 
 def graficar_histograma_v(v):
     # Función que grafica un histograma de los elementos del vector v.
