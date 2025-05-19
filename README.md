@@ -1,6 +1,8 @@
-# Trabajo Practico 1: Noche de los museos y Page Rank
+# Algebra Lineal Computacional - 1c2025
+### Repositorio de Trabajos Prácticos
 
-Requisitos en Ubuntu: python3 y python3.12-venv
+#### Trabajo Práctico 1
 
-chmod +x setup_venv.sh
-./setup_venv.sh
+- [Enunciado](<TP 1/ALC_2025-TP1-PRyMuseos.pdf>)
+- [Resolución](<TP 1/source/>)
+- [Correcciones - 19/05/25](<TP 1/Correcciones/>)
