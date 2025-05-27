@@ -38,7 +38,7 @@ def calculaLU(matriz):
 
     for j in range(m-1):
         for i in range(j+1, n):
-            Ac[i, j] = Ac[i, j] / Ac[j, j]
+            Ac[i, j] = Ac[i, j] / Ac[j, j] 
             for k in range(j+1, m):
                     Ac[i, k] = Ac[i, k] - Ac[j, k] * Ac[i, j]
             
@@ -59,23 +59,26 @@ def construir_matriz_grado(M):
         K[i,i] = np.sum(M[i,:])
     return K
 
-def inversa_de_triangular(M):
+def inversa_de_diagonal(M):
     # Función para calcular la inversa de una matriz triangular inferior
-    # M: Matriz triangular inferior
+    # M: Matriz diagonal
     # Retorna la inversa de M
 
     # Inicializo la matriz identidad
-    I = np.eye(M.shape[0])
+    M_inv = np.eye(M.shape[0])
 
-    # Usamos scipy para resolver el sistema triangular (Mx = I)
-    return scipy.linalg.solve_triangular(M,I)
+    # Aprovechando que M es una matriz diagonal, simplemente invertimos los elementos de la diagonal
+    for i in range(M.shape[0]):
+        M_inv[i,i] = 1 / M[i,i]
+
+    return M_inv
 
 def calcular_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
     # Retorna la matriz C
     K = construir_matriz_grado(A)
-    K_inv = inversa_de_triangular(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
+    K_inv = inversa_de_diagonal(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
     C = np.transpose(A) @ K_inv # Calcula C multiplicando Kinv y A
     return C
 
@@ -153,7 +156,7 @@ def calcula_matriz_C_continua(D):
     F = 1/D
     np.fill_diagonal(F,0)
     K = construir_matriz_grado(F) # Construimos la matriz de grado a partir de la matriz de distancias
-    Kinv = inversa_de_triangular(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de F 
+    Kinv = inversa_de_diagonal(K) # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de F 
     C = F @ Kinv # Calcula C multiplicando Kinv y F
     return C
 
