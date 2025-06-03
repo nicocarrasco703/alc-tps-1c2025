@@ -1,0 +1,10 @@
+ipykernel
+jupyter
+numpy
+matplotlib
+pandas
+geopandas
+seaborn
+networkx
+scipy
+jupyterlab-execute-time
