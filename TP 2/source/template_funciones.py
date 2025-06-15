@@ -5,6 +5,7 @@ import geopandas as gpd # Para hacer cosas geográficas
 import seaborn as sns # Para hacer plots lindos
 import networkx as nx # Construcción de la red en NetworkX
 import scipy
+from numpy.typing import NDArray
 
 def matriz_de_distancias(museos):
     # Tomamos museos, lo convertimos al sistema de coordenadas de interés, extraemos su geometría (los puntos del mapa), 
@@ -24,7 +25,7 @@ def construye_adyacencia(D,m):
     np.fill_diagonal(A,0) # Borramos diagonal para eliminar autolinks
     return(A)
 
-def calculaLU(matriz):
+def calculaLU(matriz: NDArray) -> tuple[NDArray, NDArray]:
     # Función para calcular la descomposición LU de una matriz
     # matriz es una matriz de NxN
     # Retorna la factorización LU a través de una lista con dos matrices L y U de NxN.
@@ -34,7 +35,7 @@ def calculaLU(matriz):
     
     if m!=n:
         print('Matriz no cuadrada')
-        return
+        return # type: ignore
 
     for j in range(m-1):
         for i in range(j+1, n):
