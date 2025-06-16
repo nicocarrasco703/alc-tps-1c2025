@@ -125,7 +125,8 @@ def metpotI2(A,mu,tol=1e-8,maxrep=np.inf):
    # Retorna el segundo autovector, su autovalor, y si el metodo llegó a converger.
    X = A + (mu * np.identity(A.shape[0])) # Calculamos la matriz A shifteada en mu
 
-   iX = np.linalg.inv(X) # La invertimos
+   L, U = TP1.calculaLU(X)
+   iX = TP1.inversa_LU(L,U) # Invertimos la matriz
 
    defliX = deflaciona(iX) # La deflacionamos
    v,l,_ =  metpot1(defliX) # Buscamos su segundo autovector

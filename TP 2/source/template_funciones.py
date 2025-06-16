@@ -74,6 +74,16 @@ def inversa_de_diagonal(M):
 
     return M_inv
 
+def inversa_LU(L,U):
+    # Función para calcular la inversa de una matriz a partir de su descomposición LU
+    # L: Matriz triangular inferior
+    # U: Matriz triangular superior
+
+    I = np.eye(L.shape[0]) # Identidad
+    L_inv = scipy.linalg.solve_triangular(L, I, lower=True) # Resolvemos Lx = I
+    U_inv = scipy.linalg.solve_triangular(U, I) # Resolvemos Ux = L_inv
+    return U_inv @ L_inv # Multiplicamos U_inv y L_inv para obtener la inversa de la matriz original
+
 def calcular_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
