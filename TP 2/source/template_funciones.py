@@ -7,6 +7,7 @@ import networkx as nx # Construcción de la red en NetworkX
 import scipy
 from numpy.typing import NDArray
 
+
 def matriz_de_distancias(museos):
     # Tomamos museos, lo convertimos al sistema de coordenadas de interés, extraemos su geometría (los puntos del mapa), 
     # calculamos sus distancias a los otros puntos de df, redondeamos (obteniendo distancia en metros), y lo convertimos a un array 2D de numpy
@@ -247,6 +248,7 @@ def calcula_matriz_C_continua(D):
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
     # Retorna la matriz C en versión continua
+    np.seterr(divide='ignore', invalid='ignore')
     D = D.copy()
     F = 1/D
     np.fill_diagonal(F,0)
