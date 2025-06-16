@@ -266,7 +266,7 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
                 verticalalignment='top')
 
     if laplaciano:
-        plt.suptitle(f'Comunidades encontradas con Laplaciano con {iteraciones} corte/s', fontsize=20) #titulo
+        plt.suptitle(f'Comunidades encontradas con Laplaciano con {iteraciones} corte/s ({2**iteraciones} comunidades)', fontsize=20) #titulo
     else:
         plt.suptitle('Comunidades encontradas con Modularidad', fontsize=20) #titulo
 
