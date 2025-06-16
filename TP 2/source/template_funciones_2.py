@@ -81,7 +81,7 @@ def deflaciona(A: NDArray, tol=1e-8, maxrep=np.inf) -> NDArray:
 def metpot2(A,v1,l1,tol=1e-8,maxrep=np.inf):# todo2: por que tiene parametro v1, l2??
    # La funcion aplica el metodo de la potencia para buscar el segundo autovalor de A, suponiendo que sus autovectores son ortogonales
    # v1 y l1 son los primeors autovectores y autovalores de A}
-   deflA = deflaciona(A)
+   deflA = A - (l1 * np.linalg.outer(v1,v1))
    return metpot1(deflA,tol,maxrep)
 
 
@@ -123,10 +123,12 @@ def metpotI2(A,mu,tol=1e-8,maxrep=np.inf):
    # Recibe la matriz A, y un valor mu y retorna el segundo autovalor y autovector de la matriz A, 
    # suponiendo que sus autovalores son positivos excepto por el menor que es igual a 0
    # Retorna el segundo autovector, su autovalor, y si el metodo llegó a converger.
-   X = ... # Calculamos la matriz A shifteada en mu
-   iX = ... # La invertimos
-   defliX = ... # La deflacionamos
-   v,l,_ =  ... # Buscamos su segundo autovector
+   X = A + (mu * np.identity(A.shape[0])) # Calculamos la matriz A shifteada en mu
+
+   iX = np.linalg.inv(X) # La invertimos
+
+   defliX = deflaciona(iX) # La deflacionamos
+   v,l,_ =  metpot1(defliX) # Buscamos su segundo autovector
    l = 1/l # Reobtenemos el autovalor correcto
    l -= mu
    return v,l,_
@@ -142,7 +144,7 @@ def laplaciano_iterativo(A,niveles,nombres_s=None):
         return([nombres_s])
     else: # Sino:
         L = calcula_L(A) # Recalculamos el L
-        v,l,_ = ... # Encontramos el segundo autovector de L
+        v,l,_ = metpotI2(A, 1) # Encontramos el segundo autovector de L
         # Recortamos A en dos partes, la que está asociada a el signo positivo de v y la que está asociada al negativo
         Ap = ... # Asociado al signo positivo
         Am = ... # Asociado al signo negativo
@@ -218,3 +220,16 @@ if __name__ == "__main__":
     s = np.array([1,1,1,1,-1,-1,-1,-1]) # "autovector v"
     print(calcula_lambda(calcula_R(A_ejemplo), s))
     print(calcula_Q(A_ejemplo, s))
+
+    L = calcula_L(A_ejemplo)
+    autovals, autovecs = np.linalg.eig(L)
+    autovals, indices = np.sort(autovals)[::-1], np.argsort(autovals)[::-1]
+    autovecs = autovecs[:, indices]
+    print("\nAutovalores de L: \n")
+    print(autovals)
+    print("\n")
+
+    # autovalor mas chico
+    print("Autovalor mas chico de L sumando mu: ", metpotI(L, 2)[1])
+    # segundo autovalor mas chico
+    print("Segundo autovalor mas chico de L: ", metpotI2(L, 2)[1])
