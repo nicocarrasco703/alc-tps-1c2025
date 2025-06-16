@@ -134,7 +134,7 @@ def metpotI2(A,mu,tol=1e-8,maxrep=np.inf):
    return v,l,_
 
 
-def laplaciano_iterativo(A,niveles,nombres_s=None):
+def laplaciano_iterativo(A: NDArray, niveles: int, nombres_s=None):
     # Recibe una matriz A, una cantidad de niveles sobre los que hacer cortes, y los nombres de los nodos
     # Retorna una lista con conjuntos de nodos representando las comunidades.
     # La función debe, recursivamente, ir realizando cortes y reduciendo en 1 el número de niveles hasta llegar a 0 y retornar.
@@ -144,10 +144,10 @@ def laplaciano_iterativo(A,niveles,nombres_s=None):
         return([nombres_s])
     else: # Sino:
         L = calcula_L(A) # Recalculamos el L
-        v,l,_ = metpotI2(A, 1) # Encontramos el segundo autovector de L
+        v,l,_ = metpotI2(L, 1) # Encontramos el segundo autovector de L
         # Recortamos A en dos partes, la que está asociada a el signo positivo de v y la que está asociada al negativo
-        Ap = ... # Asociado al signo positivo
-        Am = ... # Asociado al signo negativo
+        Ap = A[v>0,:][:,v>0] # Asociado al signo positivo
+        Am = A[v<0,:][:,v<0] # Asociado al signo negativo
         
         return(
                 laplaciano_iterativo(Ap,niveles-1,
@@ -198,6 +198,7 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
 
 
 if __name__ == "__main__":
+    np.random.seed(123)
     print("Ejercicio 3 test...\n")
     # Matriz A de ejemplo
     A_ejemplo = np.array(
@@ -233,3 +234,4 @@ if __name__ == "__main__":
     print("Autovalor mas chico de L sumando mu: ", metpotI(L, 2)[1])
     # segundo autovalor mas chico
     print("Segundo autovalor mas chico de L: ", metpotI2(L, 2)[1])
+    print(laplaciano_iterativo(A_ejemplo, 2, ["A","B","C","D","E","F","G","H"]))
