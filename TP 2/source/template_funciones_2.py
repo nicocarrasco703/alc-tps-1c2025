@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import networkx as nx # Construcción de la red en NetworkX
 # Usamos tipado de numpy para que ande bien el linting.
 import template_funciones as TP1
+import geopandas as gpd 
 
 def calcula_L(A: NDArray) -> NDArray:
     # La función recibe la matriz de adyacencia A y calcula la matriz laplaciana
@@ -204,10 +205,11 @@ def construir_adyacencias_simetricas(D, m):
     A_simetrica = np.ceil(1/2 * (A + A.T))
     return A_simetrica
 
-def graficar_red_por_particiones_2x2(D, ms, museos, barrios, factor_escala = 1e4):
+def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplaciano: bool = True, iteraciones: int = 2, factor_escala = 1e4):
     # D: matriz de distancias
     # ms: Secuencia de cantidad de links por nodo
     # museos y barrios: datos
+    # laplaciona: Usar laplaciano iterativo o modularidad para encontrar comunidades.
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de todas las redes de museos particionados
     colores = [
@@ -236,23 +238,26 @@ def graficar_red_por_particiones_2x2(D, ms, museos, barrios, factor_escala = 1e4
     for i, m in enumerate(ms):
         A = construir_adyacencias_simetricas(D,m)
         G, G_layout = TP1.construir_red_para_visualizar(A, museos)
-        particiones = laplaciano_iterativo(A, 2)
+        particiones: list[list[int]] = []
+        if laplaciano:
+            particiones = laplaciano_iterativo(A, iteraciones) # type: ignore
+        else:
+            particiones = modularidad_iterativo(A) # type: ignore
         
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
 
         nx.draw_networkx(G,G_layout, ax=ax[i],with_labels=False) # Graficamos red
 
         for j, part in enumerate(particiones):
-
-            nodos_part = {k : v for (k, v) in G_layout.items if k in part}
-            nx.draw_networkx_nodes(G, nodos_part, node_color=colores[j])
-
+            nx.draw_networkx_nodes(G, G_layout, nodelist=part, ax=ax[i], node_color=(colores[j % 12])) # todo: corregir cantidad de colores
 
         ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
                 verticalalignment='top')
 
-    
-    plt.suptitle('Museos de Buenos Aires', fontsize=20) #titulo
+    if laplaciano:
+        plt.suptitle('Comunidades encontradas con Laplaciano', fontsize=20) #titulo
+    else:
+        plt.suptitle('Comunidades encontradas con Modularidad', fontsize=20) #titulo
 
     plt.show()
 
@@ -297,3 +302,11 @@ if __name__ == "__main__":
     print(laplaciano_iterativo(A_ejemplo, 2, ["A","B","C","D","E","F","G","H"]))
 
     print(modularidad_iterativo(A_ejemplo, None, ["A","B","C","D","E","F","G","H"]))
+
+    # Leemos el archivo, retenemos aquellos museos que están en CABA, y descartamos aquellos que no tienen latitud y longitud
+    museos = gpd.read_file('https://raw.githubusercontent.com/MuseosAbiertos/Leaflet-museums-OpenStreetMap/refs/heads/principal/data/export.geojson')
+    barrios = gpd.read_file('https://cdn.buenosaires.gob.ar/datosabiertos/datasets/ministerio-de-educacion/barrios/barrios.geojson')
+    D = museos.to_crs("EPSG:22184").geometry.apply(lambda g: museos.to_crs("EPSG:22184").distance(g)).round().to_numpy()
+    ms = [3,5,10,50]
+    # for i, m in enumerate(ms):
+    graficar_red_por_particiones_2x2(D, ms=ms, museos=museos, barrios=barrios, laplaciano=False)
