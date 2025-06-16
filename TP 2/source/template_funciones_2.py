@@ -156,7 +156,6 @@ def laplaciano_iterativo(A: NDArray, niveles: int, nombres_s=None):
                                      nombres_s=[ni for ni,vi in zip(nombres_s,v) if vi<0])
                 )        
 
-
 def modularidad_iterativo(A=None,R=None,nombres_s=None):
     # Recibe una matriz A, una matriz R de modularidad, y los nombres de los nodos
     # Retorna una lista con conjuntos de nodos representando las comunidades.
@@ -170,19 +169,19 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
         nombres_s = range(R.shape[0])
     # Acá empieza lo bueno
     if R.shape[0] == 1: # Si llegamos al último nivel
-        return(...)
+        return []
     else:
-        v,l,_ = ... # Primer autovector y autovalor de R
+        v,l,_ = metpot1(R) # Primer autovector y autovalor de R
         # Modularidad Actual:
         Q0 = np.sum(R[v>0,:][:,v>0]) + np.sum(R[v<0,:][:,v<0])
         if Q0<=0 or all(v>0) or all(v<0): # Si la modularidad actual es menor a cero, o no se propone una partición, terminamos
-            return(...)
+            return []
         else:
             ## Hacemos como con L, pero usando directamente R para poder mantener siempre la misma matriz de modularidad
-            Rp = ... # Parte de R asociada a los valores positivos de v
-            Rm = ... # Parte asociada a los valores negativos de v
-            vp,lp,_ = ...  # autovector principal de Rp
-            vm,lm,_ = ... # autovector principal de Rm
+            Rp = R[(v>0),:][:,(v>0)] # Parte de R asociada a los valores positivos de v
+            Rm = R[(v<0),:][:,(v<0)] # Parte asociada a los valores negativos de v
+            vp,lp,_ = metpot1(Rp)  # autovector principal de Rp
+            vm,lm,_ = metpot1(Rm) # autovector principal de Rm
         
             # Calculamos el cambio en Q que se produciría al hacer esta partición
             Q1 = 0
@@ -194,7 +193,7 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
                 return([[ni for ni,vi in zip(nombres_s,v) if vi>0],[ni for ni,vi in zip(nombres_s,v) if vi<0]])
             else:
                 # Sino, repetimos para los subniveles
-                return(...)
+                return modularidad_iterativo(A[(v>0),:][:,(v>0)], None, nombres_s) + modularidad_iterativo(A[(v<0),:][:,(v<0)], None, nombres_s)
 
 
 if __name__ == "__main__":
@@ -235,3 +234,5 @@ if __name__ == "__main__":
     # segundo autovalor mas chico
     print("Segundo autovalor mas chico de L: ", metpotI2(L, 2)[1])
     print(laplaciano_iterativo(A_ejemplo, 2, ["A","B","C","D","E","F","G","H"]))
+
+    print(modularidad_iterativo(A_ejemplo, None, ["A","B","C","D","E","F","G","H"]))
