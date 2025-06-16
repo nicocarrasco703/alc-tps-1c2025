@@ -204,7 +204,7 @@ def graficar_red_p_multiple_2x2(D, ms, alpha, museos, barrios, factor_escala = 1
 
     plt.show()
 
-def graficar_red_p_multiple_3x3(ps, A, ms, alphas, museos, barrios, factor_escala = 1e4):
+def graficar_red_p_multiple_3x3(ps, A, m, alphas, museos, barrios, factor_escala = 1e4):
     # ps: Matriz de scores de page rank normalizados
     # A: matriz de adyacencia
     # ms: Secuencia de cantidad de links por nodo
@@ -214,31 +214,30 @@ def graficar_red_p_multiple_3x3(ps, A, ms, alphas, museos, barrios, factor_escal
     # Retorna: Un gráfico de todas las redes de museos
     if not isinstance(alphas, list):
         alphas = [alphas for i in range(len(ps))]
-    if not isinstance(ms, list):
-        ms = [ms for i in range(len(ps))]
-    
+
     G, G_layout = construir_red_para_visualizar(A, museos)
 
-    fig, all_axes = plt.subplots(nrows=3,ncols=2) # Visualización de la red en el mapa
-    fig.set_figheight(15)
-    fig.set_figwidth(15)  # Aumentamos el tamaño del grafico
+    fig, all_axes = plt.subplots(nrows=4,ncols=2, figsize=(30, 30)) # Visualización de la red en el mapa
+    # fig.set_figheight(20)
+    # fig.set_figwidth(25)  # Aumentamos el tamaño del grafico
     ax = all_axes.flat    # Pasamos la tupla a una lista
 
     for i in range(7): # Para cada 
         
-        principales = np.argsort(ps[i])[-ms[i]:] # Identificamos a los M principales
-        labels = {n: str(n) if j in principales else "" for j, n in enumerate(G.nodes)} # Nombres para esos nodos
+        #principales = np.argsort(ps[i])[-ms[i]:] # Identificamos a los M principales
+        #labels = {n: str(n) if j in principales else "" for j, n in enumerate(G.nodes)} # Nombres para esos nodos
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
 
         nx.draw_networkx(G,G_layout,node_size = ps[i]*factor_escala, ax=ax[i],with_labels=False) # Graficamos red
-        nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, ax=ax[i], font_color="k") # Agregamos los nombres
+        #nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, ax=ax[i], font_color="k") # Agregamos los nombres
 
-        ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
+        ax[i].text(0.05, 0.95, f'm = {m}', transform=ax[i].transAxes, fontsize=12,
                 verticalalignment='top')
         
-        ax[i].text(0.05, 0.90, f'α = {alphas[i]:{3}.{2}}', transform=ax[i].transAxes, fontsize=15,
+        ax[i].text(0.05, 0.90, f'α = {alphas[i]:{3}.{2}}', transform=ax[i].transAxes, fontsize=12,
                 verticalalignment='top')
-
+    fig.delaxes(ax[7])
+    plt.subplots_adjust(wspace=0.3, hspace=0.3)
     
     plt.suptitle('Museos de Buenos Aires', fontsize=20) #titulo
 
