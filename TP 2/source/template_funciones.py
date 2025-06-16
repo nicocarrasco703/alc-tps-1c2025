@@ -217,7 +217,7 @@ def graficar_red_p_multiple_3x3(ps, A, m, alphas, museos, barrios, factor_escala
 
     G, G_layout = construir_red_para_visualizar(A, museos)
 
-    fig, all_axes = plt.subplots(nrows=4,ncols=2, figsize=(30, 30)) # Visualización de la red en el mapa
+    fig, all_axes = plt.subplots(nrows=4,ncols=2, figsize=(20, 20)) # Visualización de la red en el mapa
     # fig.set_figheight(20)
     # fig.set_figwidth(25)  # Aumentamos el tamaño del grafico
     ax = all_axes.flat    # Pasamos la tupla a una lista
@@ -237,7 +237,7 @@ def graficar_red_p_multiple_3x3(ps, A, m, alphas, museos, barrios, factor_escala
         ax[i].text(0.05, 0.90, f'α = {alphas[i]:{3}.{2}}', transform=ax[i].transAxes, fontsize=12,
                 verticalalignment='top')
     fig.delaxes(ax[7])
-    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    plt.subplots_adjust(wspace=-0.5, hspace=0.1, top = 0.95)
     
     plt.suptitle('Museos de Buenos Aires', fontsize=20) #titulo
 
