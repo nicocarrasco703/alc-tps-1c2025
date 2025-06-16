@@ -160,7 +160,7 @@ def laplaciano_iterativo(A: NDArray, niveles: int, nombres_s=None):
                                      nombres_s=[ni for ni,vi in zip(nombres_s,v) if vi<0])
                 )        
 
-def modularidad_iterativo(A=None,R=None,nombres_s=None):
+def modularidad_iterativo(A: NDArray, R=None, nombres_s=None):
     # Recibe una matriz A, una matriz R de modularidad, y los nombres de los nodos
     # Retorna una lista con conjuntos de nodos representando las comunidades.
 
@@ -197,7 +197,10 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
                 return([[ni for ni,vi in zip(nombres_s,v) if vi>0],[ni for ni,vi in zip(nombres_s,v) if vi<0]])
             else:
                 # Sino, repetimos para los subniveles
-                return modularidad_iterativo(A[(v>0),:][:,(v>0)], None, nombres_s) + modularidad_iterativo(A[(v<0),:][:,(v<0)], None, nombres_s)
+                return (
+                    modularidad_iterativo(A[(v>0),:][:,(v>0)], Rp, [ni for ni,vi in zip(nombres_s,v) if vi>0]) + 
+                    modularidad_iterativo(A[(v<0),:][:,(v<0)], Rm, [ni for ni,vi in zip(nombres_s,v) if vi<0])
+                )
             
 
 def construir_adyacencias_simetricas(D, m):
@@ -243,7 +246,7 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
             particiones = laplaciano_iterativo(A, iteraciones) # type: ignore
         else:
             particiones = modularidad_iterativo(A) # type: ignore
-        
+        print(len(particiones))
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
 
         nx.draw_networkx(G,G_layout, ax=ax[i],with_labels=False) # Graficamos red
