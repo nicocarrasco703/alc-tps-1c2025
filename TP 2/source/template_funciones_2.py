@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.typing import NDArray
 import scipy
+import matplotlib.pyplot as plt
+import networkx as nx # Construcción de la red en NetworkX
 # Usamos tipado de numpy para que ande bien el linting.
 import template_funciones as TP1
 
@@ -195,6 +197,64 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
             else:
                 # Sino, repetimos para los subniveles
                 return modularidad_iterativo(A[(v>0),:][:,(v>0)], None, nombres_s) + modularidad_iterativo(A[(v<0),:][:,(v<0)], None, nombres_s)
+            
+
+def construir_adyacencias_simetricas(D, m):
+    A = TP1.construye_adyacencia(D,m)
+    A_simetrica = np.ceil(1/2 * (A + A.T))
+    return A_simetrica
+
+def graficar_red_por_particiones_2x2(D, ms, museos, barrios, factor_escala = 1e4):
+    # D: matriz de distancias
+    # ms: Secuencia de cantidad de links por nodo
+    # museos y barrios: datos
+    # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
+    # Retorna: Un gráfico de todas las redes de museos particionados
+    colores = [
+    "#1f77b4",  # azul
+    "#ff7f0e",  # naranja
+    "#2ca02c",  # verde
+    "#d62728",  # rojo
+    "#9467bd",  # violeta
+    "#8c564b",  # marrón
+    "#e377c2",  # rosa
+    "#7f7f7f",  # gris
+    "#bcbd22",  # verde lima
+    "#17becf",  # celeste
+    "#aec7e8",  # azul claro
+    "#ffbb78",  # naranja claro
+    ]
+
+    if not isinstance(ms, list):
+        ms = [ms for i in range(4)]
+    
+    fig, all_axes = plt.subplots(nrows=2,ncols=2) # Visualización de la red en el mapa
+    fig.set_figheight(15)
+    fig.set_figwidth(15)  # Aumentamos el tamaño del grafico
+    ax = all_axes.flat    # Pasamos la tupla a una lista
+
+    for i, m in enumerate(ms):
+        A = construir_adyacencias_simetricas(D,m)
+        G, G_layout = TP1.construir_red_para_visualizar(A, museos)
+        particiones = laplaciano_iterativo(A, 2)
+        
+        barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
+
+        nx.draw_networkx(G,G_layout, ax=ax[i],with_labels=False) # Graficamos red
+
+        for j, part in enumerate(particiones):
+
+            nodos_part = {k : v for (k, v) in G_layout.items if k in part}
+            nx.draw_networkx_nodes(G, nodos_part, node_color=colores[j])
+
+
+        ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
+                verticalalignment='top')
+
+    
+    plt.suptitle('Museos de Buenos Aires', fontsize=20) #titulo
+
+    plt.show()
 
 
 if __name__ == "__main__":
