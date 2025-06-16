@@ -216,18 +216,26 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de todas las redes de museos particionados
     colores = [
-    "#1f77b4",  # azul
-    "#ff7f0e",  # naranja
-    "#2ca02c",  # verde
-    "#d62728",  # rojo
-    "#9467bd",  # violeta
-    "#8c564b",  # marrón
-    "#e377c2",  # rosa
-    "#7f7f7f",  # gris
-    "#bcbd22",  # verde lima
-    "#17becf",  # celeste
-    "#aec7e8",  # azul claro
-    "#ffbb78",  # naranja claro
+        "#1f77b4",  # azul
+        "#ff7f0e",  # naranja
+        "#2ca02c",  # verde
+        "#d62728",  # rojo
+        "#9467bd",  # violeta
+        "#8c564b",  # marrón
+        "#e377c2",  # rosa
+        "#7f7f7f",  # gris
+        "#bcbd22",  # verde lima
+        "#17becf",  # celeste
+        "#aec7e8",  # azul claro
+        "#ffbb78",  # naranja claro
+        "#98df8a",  # verde claro
+        "#ff9896",  # rojo claro
+        "#c5b0d5",  # violeta claro
+        "#c49c94",  # marrón claro
+        "#f7b6d2",  # rosa claro
+        "#c7c7c7",  # gris claro
+        "#dbdb8d",  # amarillo pálido
+        "#9edae5",  # celeste claro
     ]
 
     if not isinstance(ms, list):
@@ -252,13 +260,13 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
         nx.draw_networkx(G,G_layout, ax=ax[i],with_labels=False) # Graficamos red
 
         for j, part in enumerate(particiones):
-            nx.draw_networkx_nodes(G, G_layout, nodelist=part, ax=ax[i], node_color=(colores[j % 12])) # todo: corregir cantidad de colores
+            nx.draw_networkx_nodes(G, G_layout, nodelist=part, ax=ax[i], node_color=(colores[j])) # todo: corregir cantidad de colores
 
         ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
                 verticalalignment='top')
 
     if laplaciano:
-        plt.suptitle('Comunidades encontradas con Laplaciano', fontsize=20) #titulo
+        plt.suptitle(f'Comunidades encontradas con Laplaciano con {iteraciones} corte/s', fontsize=20) #titulo
     else:
         plt.suptitle('Comunidades encontradas con Modularidad', fontsize=20) #titulo
 
