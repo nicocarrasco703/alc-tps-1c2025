@@ -158,28 +158,34 @@ def graficar_red_p(pr, A, m, alpha, museos, barrios, factor_escala = 1e4):
 
     plt.show()
 
-def graficar_red_p_multiple_2x2(ps, A, ms, alphas, museos, barrios, factor_escala = 1e4):
-    # ps: Matriz de scores de page rank normalizados
-    # A: matriz de adyacencia
+def graficar_red_p_multiple_2x2(D, ms, alpha, museos, barrios, factor_escala = 1e4):
+    # D: matriz de distancias
     # ms: Secuencia de cantidad de links por nodo
-    # alphas: Lista de coeficientes de damping
+    # alpha: coeficiente de damping
     # museos y barrios: datos
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de todas las redes de museos
-    if not isinstance(alphas, list):
-        alphas = [alphas for i in range(len(ps))]
-    if not isinstance(ms, list):
-        ms = [ms for i in range(len(ps))]
-    
-    G, G_layout = construir_red_para_visualizar(A, museos)
+    # if not isinstance(ms, list):
+    #     ms = [ms for i in range(len(ps))]
 
     fig, all_axes = plt.subplots(nrows=2,ncols=2) # Visualización de la red en el mapa
     fig.set_figheight(15)
     fig.set_figwidth(15)  # Aumentamos el tamaño del grafico
     ax = all_axes.flat    # Pasamos la tupla a una lista
 
-    for i in range(4): # Para cada 
-        
+
+    for i, m in enumerate(ms): # Para cada m cantidad de conexiones
+
+        A = construye_adyacencia(D,m)
+        G, G_layout = construir_red_para_visualizar(A, museos)
+
+        ps = [] # Lista de scores page rank para cada m
+        for m in ms:
+            pr = calcular_p(D, m, alpha)
+            ps.append(pr)
+
+            
+
         principales = np.argsort(ps[i])[-ms[i]:] # Identificamos a los M principales
         labels = {n: str(n) if j in principales else "" for j, n in enumerate(G.nodes)} # Nombres para esos nodos
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
@@ -190,7 +196,7 @@ def graficar_red_p_multiple_2x2(ps, A, ms, alphas, museos, barrios, factor_escal
         ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
                 verticalalignment='top')
         
-        ax[i].text(0.05, 0.90, f'α = {alphas[i]:{3}.{2}}', transform=ax[i].transAxes, fontsize=15,
+        ax[i].text(0.05, 0.90, f'α = {alpha}', transform=ax[i].transAxes, fontsize=15,
                 verticalalignment='top')
 
     
