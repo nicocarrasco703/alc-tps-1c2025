@@ -129,11 +129,12 @@ def construir_red_para_visualizar(A, museos):
     G_layout = {i:v for i,v in enumerate(zip(museos.to_crs("EPSG:22184").get_coordinates()['x'],museos.to_crs("EPSG:22184").get_coordinates()['y']))}
     return G, G_layout
 
-def graficar_red_p(pr, A, m, alpha, museos, barrios, factor_escala = 1e4):
+def graficar_red_p(pr, A, m, alpha, Nprincipales, museos, barrios, factor_escala = 1e4):
     # pr: Vector de scores de page rank normalizados
     # A: matriz de adyacencia
     # m: cantidad de links por nodo
     # alpha: coeficiente de damping
+    # Nprincipales: Cantidad de nodos principales a mostrar
     # museos y barrios: datos
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de la red de museos
@@ -141,7 +142,7 @@ def graficar_red_p(pr, A, m, alpha, museos, barrios, factor_escala = 1e4):
     G, G_layout = construir_red_para_visualizar(A, museos)
 
     fig, ax = plt.subplots(figsize=(15, 15)) # Visualización de la red en el mapa
-    principales = np.argsort(pr)[-m:] # Identificamos a los M principales
+    principales = np.argsort(pr)[-Nprincipales:] # Identificamos a los M principales
     labels = {n: str(n) if i in principales else "" for i, n in enumerate(G.nodes)} # Nombres para esos nodos
     barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax) # Graficamos Los barrios
 
@@ -225,12 +226,13 @@ def graficar_red_p_multiple_3x3(ps, A, m, alphas, museos, barrios, factor_escala
 
     for i in range(7): # Para cada 
         
-        #principales = np.argsort(ps[i])[-ms[i]:] # Identificamos a los M principales
-        #labels = {n: str(n) if j in principales else "" for j, n in enumerate(G.nodes)} # Nombres para esos nodos
+        Nprincipales = 5 # Cantidad de principales
+        principales = np.argsort(ps[i])[-Nprincipales:] # Identificamos a los N principales m cantidad de conexiones
+        labels = {n: str(n) if k in principales else "" for k, n in enumerate(G.nodes)}
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
 
         nx.draw_networkx(G,G_layout,node_size = ps[i]*factor_escala, ax=ax[i],with_labels=False) # Graficamos red
-        #nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, ax=ax[i], font_color="k") # Agregamos los nombres
+        nx.draw_networkx_labels(G, G_layout, labels=labels, font_size=6, ax=ax[i], font_color="k") # Agregamos los nombres
 
         ax[i].text(0.05, 0.95, f'm = {m}', transform=ax[i].transAxes, fontsize=12,
                 verticalalignment='top')
