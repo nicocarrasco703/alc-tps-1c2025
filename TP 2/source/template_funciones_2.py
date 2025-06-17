@@ -212,7 +212,7 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
     # D: matriz de distancias
     # ms: Secuencia de cantidad de links por nodo
     # museos y barrios: datos
-    # laplaciona: Usar laplaciano iterativo o modularidad para encontrar comunidades.
+    # laplaciano: Usar laplaciano iterativo o modularidad para encontrar comunidades.
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de todas las redes de museos particionados
     colores = [
@@ -246,6 +246,8 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
     fig.set_figwidth(15)  # Aumentamos el tamaño del grafico
     ax = all_axes.flat    # Pasamos la tupla a una lista
 
+    cant_particiones = []
+
     for i, m in enumerate(ms):
         A = construir_adyacencias_simetricas(D,m)
         G, G_layout = TP1.construir_red_para_visualizar(A, museos)
@@ -254,21 +256,24 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
             particiones = laplaciano_iterativo(A, iteraciones) # type: ignore
         else:
             particiones = modularidad_iterativo(A) # type: ignore
-        print(len(particiones))
+            cant_particiones.append(len(particiones))
+
         barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax[i]) # Graficamos Los barrios
 
         nx.draw_networkx(G,G_layout, ax=ax[i],with_labels=False) # Graficamos red
 
         for j, part in enumerate(particiones):
-            nx.draw_networkx_nodes(G, G_layout, nodelist=part, ax=ax[i], node_color=(colores[j])) # todo: corregir cantidad de colores
+            nx.draw_networkx_nodes(G, G_layout, nodelist=part, ax=ax[i], node_color=(colores[j]))
 
         ax[i].text(0.05, 0.95, f'm = {ms[i]}', transform=ax[i].transAxes, fontsize=15,
                 verticalalignment='top')
 
     if laplaciano:
-        plt.suptitle(f'Comunidades encontradas con Laplaciano con {iteraciones} corte/s ({2**iteraciones} comunidades)', fontsize=20) #titulo
+        plt.suptitle(f'Comunidades encontradas con Laplaciano con {iteraciones} corte/s ({2**iteraciones} comunidades)', fontsize=20, y=0.93) #titulo
     else:
-        plt.suptitle('Comunidades encontradas con Modularidad', fontsize=20) #titulo
+        plt.suptitle('Comunidades encontradas con Modularidad', fontsize=20, y=0.93) #titulo
+        for k in range(4):
+            ax[k].set_title(f'{cant_particiones[k]} comunidades', fontsize=16)
 
     plt.show()
 
