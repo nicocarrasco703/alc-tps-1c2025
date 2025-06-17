@@ -33,9 +33,9 @@ def calcula_R(A):
     return R
 
 
-def calcula_lambda(L: NDArray, v: NDArray) -> float:
+def calcula_lambda(L: NDArray, v: NDArray) -> float: # todo: No usamos esta funcion luego.
     # Recibe L y v y retorna el corte asociado
-    s: NDArray = np.sign(v) #todo1: Puedo usar np.sign?
+    s: NDArray = np.sign(v) # todo! no usar norm.
     Λ: float = 1/4 * float (s.T @ (L @ s))
     return Λ
 
@@ -88,39 +88,19 @@ def metpot2(A,v1,l1,tol=1e-8,maxrep=np.inf):# todo2: por que tiene parametro v1,
    return metpot1(deflA,tol,maxrep)
 
 
-def metpotI(A: NDArray, mu, tol=1e-8, maxrep=np.inf):
+def metpotI(A: NDArray, mu: float, tol=1e-8, maxrep=np.inf):
     # Retorna el primer autovalor de la inversa de A + mu * I, junto a su autovector y si el método convergió.
-    # todo: Tengo la duda de que el codigo del template tenia: return metpot1(...,tol=tol,maxrep=maxrep)
+    # A: Matriz
+    # mu: Factor de shifting
+    # tol: Precision
+    # maxrep: Cantidad maxima de repeticiones
+    
+    # Aplicamos shifting de autovalores, factorizamos e invertimos la matriz.
     M: NDArray = A + (mu * np.identity(A.shape[0]))
     L, U = TP1.calculaLU(M)
-
-    v = np.random.uniform(-1, 1, M.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
-    v = normalizar(v) # Lo normalizamos
-
-    # En vez de multiplicar la matriz, v1 = M v, resolvemos el sistema
-    v1 = resolverLUinversa(L, U, v)
-    v1 = normalizar(v1)
-    l = autovalor(M, v) # Estimamos el autovalor, usando la matriz M original.
-    l1 = autovalor(M, v1) # Calculamos los primeros pasos
-    nrep = 0 # Contador
-    while np.abs(l1-l)/np.abs(l) > tol and nrep < maxrep: # Si estamos por debajo de la tolerancia buscada 
-        v = v1 # actualizamos v y repetimos
-        l = l1
-        v1 = resolverLUinversa(L, U, v1)
-        v1 = normalizar(v1) # Normalizo
-        l1 = autovalor(M, v1) # Calculo autovalor
-        nrep += 1 # Un pasito mas
-        if not nrep < maxrep:
-            print('MaxRep alcanzado')
-    l = autovalor(M, v1) # Calculamos el autovalor final
-    return v1,l,nrep<maxrep
-
-def resolverLUinversa(L: NDArray, U:NDArray, v:NDArray) -> NDArray:
-    # Resuelve el sistema: LU x = v. 
-    # Aprovechando que la matriz esta factorizada para no tener que invertirla
-    Ly = scipy.linalg.solve_triangular(L,v,lower=True)
-    x = scipy.linalg.solve_triangular(U,Ly)
-    return x
+    Mi = TP1.inversa_LU(L,U) # Invertimos M
+    
+    return metpot1(Mi, tol=tol, maxrep=maxrep) # Usamos el metodo de la potencia ya implementado.
 
 def metpotI2(A,mu,tol=1e-8,maxrep=np.inf):
    # Recibe la matriz A, y un valor mu y retorna el segundo autovalor y autovector de la matriz A, 
