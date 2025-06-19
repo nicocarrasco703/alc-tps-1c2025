@@ -54,13 +54,14 @@ def norma_2(v: NDArray) -> np.float64:
     return np.sqrt(np.sum(v**2))
 
 def normalizar(v: NDArray) -> NDArray:
-    return v / np.linalg.norm(v)
+    return v / norma_2(v)
 
 
-def metpot1(A,tol=1e-8,maxrep=np.inf) -> tuple[NDArray, float, bool]:
+def metpot1(A,tol=1e-8,maxrep=np.inf, seed=234) -> tuple[NDArray, float, bool]:
    # Recibe una matriz A y calcula su autovalor de mayor módulo, con un error relativo menor a tol y-o haciendo como mucho maxrep repeticiones
    # Devuelve la tupla (autovector, autovalor, alcanzoMaxRep?)
-   v = np.random.uniform(-1, 1, A.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
+   rng = np.random.default_rng(seed)
+   v = rng.uniform(-1, 1, A.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
    v = normalizar(v) # Lo normalizamos
    v1 = A @ v # Aplicamos la matriz una vez
    v1 = normalizar(v1) # normalizamos
