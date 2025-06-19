@@ -33,20 +33,23 @@ def calcula_R(A: NDArray) -> NDArray:
 
 
 def calcula_lambda(L: NDArray, v: NDArray) -> float:
-    # Recibe L: Matriz laplaciana y v: autovector y devuelve el corte asociado a v.
+    # Recibe L Matriz laplaciana y v: autovector
+    # Devuelve el corte asociado a v.
     s: NDArray = np.sign(v)
     Λ: float = 1/4 * float (s.T @ (L @ s))
     return Λ
 
 
 def calcula_Q(R: NDArray, v: NDArray)-> float:
-    # La funcion recibe R y s y retorna la modularidad (a menos de un factor 2E)
+    # Recibe R matriz y v autovector
+    # Retorna la modularidad (a menos de un factor 2E)
     s: NDArray = np.sign(v)
     Q: float = float (s.T @ (R @ s))
     return Q
 
 def autovalor(A: NDArray, v: NDArray) -> np.float64:
-    l: np.float64 = (v.T @ A @ v) / (v.T @ v) # Coeficiente de rayleigh. Desambiguo el array con [0].
+    # Recibe una matriz A y un vector v, y calcula el autovalor asociado a v.
+    l: np.float64 = (v.T @ A @ v) / (v.T @ v) # Coeficiente de Rayleigh. Desambiguo el array con [0].
     return l
 
 def norma_2(v: NDArray) -> np.float64:
@@ -54,6 +57,7 @@ def norma_2(v: NDArray) -> np.float64:
     return np.sqrt(np.sum(v**2))
 
 def normalizar(v: NDArray) -> NDArray:
+    # Recibe un vector y lo normaliza, dividiendo por su norma 2.
     return v / norma_2(v)
 
 
@@ -200,8 +204,11 @@ def modularidad_iterativo(A: NDArray, R: NDArray | None = None, nombres_s: lista
             
 
 def construir_adyacencias_simetricas(D, m):
+    # D: matriz de distancias
+    # m: Cantidad de links por nodo
+    # Retorna una matriz de adyacencia simétrica
     A = TP1.construye_adyacencia(D,m)
-    A_simetrica = np.ceil(1/2 * (A + A.T))
+    A_simetrica = np.ceil(1/2 * (A + A.T)) # Hacemos simétrica la matriz de adyacencia
     return A_simetrica
 
 def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplaciano: bool = True, iteraciones: int = 2, factor_escala = 1e4):
@@ -209,6 +216,7 @@ def graficar_red_por_particiones_2x2(D, ms: list[int], museos, barrios, laplacia
     # ms: Secuencia de cantidad de links por nodo
     # museos y barrios: datos
     # laplaciano: Usar laplaciano iterativo o modularidad para encontrar comunidades.
+    # iteraciones: Cantidad de iteraciones a realizar en el laplaciano iterativo
     # factor_escala: Escalamos los nodos 10 mil veces para que sean bien visibles
     # Retorna: Un gráfico de todas las redes de museos particionados
     colores = [
