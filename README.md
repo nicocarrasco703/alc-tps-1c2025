@@ -12,3 +12,5 @@
 - [Enunciado](<TP 2/ALC_1C2025-TP2-Comunidades.pdf>)
 
 - [Resolución](<TP 2/source/>)
+
+- [Correcciones - 03/07/25](<TP 2/Correcciones/>)
