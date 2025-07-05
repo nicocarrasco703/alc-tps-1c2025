@@ -36,8 +36,8 @@ def calcula_lambda(L: NDArray, v: NDArray) -> float:
     # Recibe L Matriz laplaciana y v: autovector
     # Devuelve el corte asociado a v.
     s: NDArray = np.sign(v)
-    Λ: float = 1/4 * float (s.T @ (L @ s)) #> No usen caracteres raros en el codigo que se puede romper todo
-    return Λ
+    corte: float = 1/4 * float (s.T @ (L @ s))
+    return corte
 
 
 def calcula_Q(R: NDArray, v: NDArray)-> float:
