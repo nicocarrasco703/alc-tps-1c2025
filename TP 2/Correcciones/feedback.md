@@ -12,10 +12,10 @@ Si quieren me pueden arrobar por discord para ver si estoy y nos metemos en una 
 Por si no están en el discord de la materia, este es el link (vence en una semana): https://discord.gg/6RDuxRPX
 
 Cosas importantes:
-- Entreguen el TP entero, incluyendo las cosas del 1 (corregidas). Siempre asegúrense de que lo que entregan corra.
-- En el 2a básicamente se saltean la demostración que pide la consigna. Esta vez si soy un poco más claro, recomendaría que no 
-traten de demostrarlo viendo la estructura de la matriz, sino que usen propiedades de autovalores y autovectores. Parecido 
-a las cosas que hicieron en el 1.
+- ~~Entreguen el TP entero, incluyendo las cosas del 1 (corregidas). Siempre asegúrense de que lo que entregan corra.~~
+- ~~En el 2a básicamente se saltean la demostración que pide la consigna. Esta vez si soy un poco más claro, recomendaría que no~~ 
+~~traten de demostrarlo viendo la estructura de la matriz, sino que usen propiedades de autovalores y autovectores. Parecido~~ 
+~~a las cosas que hicieron en el 1.~~
 - La explicación en el 4 es muy descriptiva pero no tiene mucho análisis. Por qué la semilla afecta al resultado? Eso importa?
 Algún método es mejor que el otro? Tienen sentido todos los cortes?
 
@@ -23,5 +23,5 @@ Detalles
 - La demo del 2 del TP1 sigue teniendo algunas cosas para arreglar. Debería haber sido más claro en el primero 
 con lo de "o hagan otra cosa", porque la demo sale sin tener que usar esa propiedad. Ahora que ya hicieron todo ese 
 esfuerzo les diría que ya lo dejen así y solo terminen de arreglar la demo.
-- La demo del 2b está bien pero tiene algunos detalles que no coinciden con el enunciado. También podían hacerla sin 
-pasar por la demostración del método de la potencia (no hace falta que lo cambien ahora), eso si que lo pueden dar por demostrado.
+- ~~La demo del 2b está bien pero tiene algunos detalles que no coinciden con el enunciado. También podían hacerla sin~~ 
+~~pasar por la demostración del método de la potencia (no hace falta que lo cambien ahora), eso si que lo pueden dar por demostrado.~~
