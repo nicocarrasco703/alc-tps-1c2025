@@ -20,8 +20,8 @@ Cosas importantes:
 Algún método es mejor que el otro? Tienen sentido todos los cortes?
 
 Detalles
-- La demo del 2 del TP1 sigue teniendo algunas cosas para arreglar. Debería haber sido más claro en el primero 
-con lo de "o hagan otra cosa", porque la demo sale sin tener que usar esa propiedad. Ahora que ya hicieron todo ese 
-esfuerzo les diría que ya lo dejen así y solo terminen de arreglar la demo.
+- ~~La demo del 2 del TP1 sigue teniendo algunas cosas para arreglar. Debería haber sido más claro en el primero~~ 
+~~con lo de "o hagan otra cosa", porque la demo sale sin tener que usar esa propiedad. Ahora que ya hicieron todo ese~~ 
+~~esfuerzo les diría que ya lo dejen así y solo terminen de arreglar la demo.~~
 - ~~La demo del 2b está bien pero tiene algunos detalles que no coinciden con el enunciado. También podían hacerla sin~~ 
 ~~pasar por la demostración del método de la potencia (no hace falta que lo cambien ahora), eso si que lo pueden dar por demostrado.~~

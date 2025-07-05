@@ -61,7 +61,7 @@ def normalizar(v: NDArray) -> NDArray:
     return v / norma_2(v)
 
 
-def metpot1(A,tol=1e-8,maxrep=np.inf, seed=234) -> tuple[NDArray, float, bool]:
+def metpot1(A,tol=1e-8,maxrep=np.inf, seed=123) -> tuple[NDArray, float, bool]:
    # Recibe una matriz A y calcula su autovalor de mayor módulo, con un error relativo menor a tol y-o haciendo como mucho maxrep repeticiones
    # Devuelve la tupla (autovector, autovalor, alcanzoMaxRep?)
    rng = np.random.default_rng(seed)
