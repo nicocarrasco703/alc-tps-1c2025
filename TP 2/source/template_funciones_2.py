@@ -64,8 +64,7 @@ def normalizar(v: NDArray) -> NDArray:
 def metpot1(A,tol=1e-8,maxrep=np.inf, seed=123) -> tuple[NDArray, float, bool]:
    # Recibe una matriz A y calcula su autovalor de mayor módulo, con un error relativo menor a tol y-o haciendo como mucho maxrep repeticiones
    # Devuelve la tupla (autovector, autovalor, alcanzoMaxRep?)
-   rng = np.random.default_rng(seed)
-   v = rng.uniform(-1, 1, A.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
+   v = np.random.uniform(-1, 1, A.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
    v = normalizar(v) # Lo normalizamos
    v1 = A @ v # Aplicamos la matriz una vez
    v1 = normalizar(v1) # normalizamos
@@ -299,34 +298,57 @@ if __name__ == "__main__":
         ]
     )
 
+    R = calcula_R(A_ejemplo)
+    L = calcula_L(A_ejemplo)
+
     print("Calcular L de A_ejemplo: \n\n")
-    print(calcula_L(A_ejemplo))
+    print(L)
     print("\nCalcular R de A_ejemplo: \n\n")
-    print(calcula_R(A_ejemplo))
+    print(R)
     s = np.array([1,1,1,1,-1,-1,-1,-1]) # "autovector v"
     print(calcula_lambda(calcula_R(A_ejemplo), s))
     print(calcula_Q(A_ejemplo, s))
 
-    L = calcula_L(A_ejemplo)
+
+    # LAPLACIANO
     autovals, autovecs = np.linalg.eig(L)
     autovals, indices = np.sort(autovals)[::-1], np.argsort(autovals)[::-1]
     autovecs = autovecs[:, indices]
-    print("\nAutovalores de L: \n")
-    print(autovals)
+    print("\nAutovalor más chico de L encontrado por Numpy: \n")
+    print(np.min(autovals))
     print("\n")
 
     # autovalor mas chico
-    print("Autovalor mas chico de L sumando mu: ", metpotI(L, 2)[1])
+    print("Autovalor mas chico de L+2I: ", metpotI(L, 2)[1])
     # segundo autovalor mas chico
-    print("Segundo autovalor mas chico de L: ", metpotI2(L, 2)[1])
+    segundo_aval_mas_chico = metpotI2(L, 2)[1]
+    segundo_avec_mas_chico = metpotI2(L, 2)[0]
+    print("Segundo autovalor mas chico de L+2I: ", segundo_aval_mas_chico)
+    print("Corte producido por el Laplaciano: ", np.sign(segundo_avec_mas_chico))
     print("Laplaciano iterativo de A_ejemplo:")
-    print(laplaciano_iterativo(A_ejemplo, 2))
+    print(laplaciano_iterativo(A_ejemplo, 1))
+    print("\n")
+
+    # MODULARIDAD
+
+    autovals, autovecs = np.linalg.eig(R)
+    autovals, indices = np.sort(autovals)[::-1], np.argsort(autovals)[::-1]
+    autovecs = autovecs[:, indices]
+    print("\nAutovalor más grande de R encontrado por Numpy: \n")
+    print(np.max(autovals))
+    print("\n")
+
+    aval_mas_grande = metpot1(R)[1]
+    avec_mas_grande = metpot1(R)[0]
+
+    print("Autovalor mas grande de R: ", aval_mas_grande)
+    print("Corte producido por modularidad: ", np.sign(avec_mas_grande))    
     print(modularidad_iterativo(A_ejemplo))
 
-    # Leemos el archivo, retenemos aquellos museos que están en CABA, y descartamos aquellos que no tienen latitud y longitud
-    museos = gpd.read_file('https://raw.githubusercontent.com/MuseosAbiertos/Leaflet-museums-OpenStreetMap/refs/heads/principal/data/export.geojson')
-    barrios = gpd.read_file('https://cdn.buenosaires.gob.ar/datosabiertos/datasets/ministerio-de-educacion/barrios/barrios.geojson')
-    D = museos.to_crs("EPSG:22184").geometry.apply(lambda g: museos.to_crs("EPSG:22184").distance(g)).round().to_numpy()
-    ms = [3,5,10,50]
-    # for i, m in enumerate(ms):
-    graficar_red_por_particiones_2x2(D, ms=ms, museos=museos, barrios=barrios, laplaciano=False)
+    # # Leemos el archivo, retenemos aquellos museos que están en CABA, y descartamos aquellos que no tienen latitud y longitud
+    # museos = gpd.read_file('https://raw.githubusercontent.com/MuseosAbiertos/Leaflet-museums-OpenStreetMap/refs/heads/principal/data/export.geojson')
+    # barrios = gpd.read_file('https://cdn.buenosaires.gob.ar/datosabiertos/datasets/ministerio-de-educacion/barrios/barrios.geojson')
+    # D = museos.to_crs("EPSG:22184").geometry.apply(lambda g: museos.to_crs("EPSG:22184").distance(g)).round().to_numpy()
+    # ms = [3,5,10,50]
+    # # for i, m in enumerate(ms):
+    # graficar_red_por_particiones_2x2(D, ms=ms, museos=museos, barrios=barrios, laplaciano=False)
